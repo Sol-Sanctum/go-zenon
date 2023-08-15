@@ -173,6 +173,12 @@ func (pm *ProtocolManager) newPeer(pv, nv int, p *p2p.Peer, rw p2p.MsgReadWriter
 func (pm *ProtocolManager) handle(p *peer) error {
 	log.Info("peer connected", "peer-id", p.id, "address", p.RemoteAddr().String(), "name", p.Name())
 
+    if !strings.Contains(p.Name(), "v0.0.7") {
+		log.Info("peer removed due to old node version", p.Name())
+		pm.removePeer(p.id)
+		return nil
+	}
+
 	// Execute the Ethereum handshake
 	td, head, genesis := pm.chainman.Status()
 	if err := p.Handshake(td, head, genesis); err != nil {
